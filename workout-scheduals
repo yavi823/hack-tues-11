@@ -1,0 +1,23 @@
+ Monday: ["Strength training: Full-body workout (squats, deadlifts, bench press)", "Cardio: 20-minute light jog"],
+                    Tuesday: ["Strength training: Upper body (push-ups, bicep curls, shoulder press)", "Core workout (planks, Russian twists)"],
+                    Wednesday: ["Active rest: Stretching or yoga"],
+                    Thursday: ["Strength training: Lower body (lunges, calf raises)", "Cardio: 20-minute bike ride"],
+                    Friday: ["Strength training: Full-body workout", "Core workout (crunches, leg raises)"],
+                    Saturday: ["Cardio: 30-minute light jog"],
+                    Sunday: ["Rest day"]
+  lose: {
+                    Monday: ["Cardio: 30-minute running", "Strength training: Full-body circuit"],
+                    Tuesday: ["Cardio: 45-minute cycling", "Core workout"],
+                    Wednesday: ["Strength training: Upper body", "Flexibility training"],
+                    Thursday: ["Cardio: 30-minute swimming", "Core workout"],
+                    Friday: ["Strength training: Lower body", "Cardio: 20-minute brisk walk"],
+                    Saturday: ["HIIT: 20-minute session"],
+                    Sunday: ["Rest day"]
+ maintain: {
+                    Monday: ["Strength training: Full-body workout", "Cardio: 30-minute jog"],
+                    Tuesday: ["Core workout", "Cardio: 30-minute cycling"],
+                    Wednesday: ["Active rest: Yoga"],
+                    Thursday: ["Strength training: Upper body", "Cardio: 20-minute swim"],
+                    Friday: ["Strength training: Lower body", "Core workout"],
+                    Saturday: ["Cardio: 30-minute HIIT"],
+                    Sunday: ["Rest day"]
