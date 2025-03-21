@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Fitness Program</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            color: #333;
+            margin: 20px;
+        }
+        h1, h2, h3 {
+            color: #0044cc;
+        }
+        form {
+            background-color: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #ffd700;
+        }
+        label {
+            font-weight: bold;
+            margin: 10px 0 5px;
+            display: block;
+        }
+        input, select {
+            padding: 10px;
+            width: 100%;
+            border: 2px solid #0044cc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #0044cc;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #002a80;
+        }
+        #output {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9ff;
+            border-left: 5px solid #ffd700;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Welcome to Your Personalized Fitness Program</h1>
+
+    <form id="fitness-form" onsubmit="event.preventDefault(); generatePlan();">
+        <label for="height">Height (in cm): </label>
+        <input type="number" id="height" name="height" min="1" required>
+
+        <label for="weight">Weight (in kg): </label>
+        <input type="number" id="weight" name="weight" min="1" required>
+
+        <label for="birth-year">Birth Year: </label>
+        <input type="number" id="birth-year" name="birth-year" min="1900" required>
+
+        <label for="gender">Gender: </label>
+        <select id="gender" name="gender" required>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select>
+
+        <label for="finance">Finance (for diet and supplements budget): </label>
+        <input type="number" id="finance" name="finance" min="0" required>
+
+        <label for="allergies">Do you have any food allergies? (List, separated by commas): </label>
+        <input type="text" id="allergies" name="allergies">
+
+        <label for="goal">Select your goal: </label>
+        <select id="goal" name="goal" required>
+            <option value="gain">Gain Weight</option>
+            <option value="lose">Lose Weight</option>
+            <option value="maintain">Maintain Weight</option>
+        </select>
+
+        <button type="submit">Get Fitness Plan</button>
+    </form>
+
+    <div id="output"></div>
+
+    <script>
+        const currentYear = new Date().getFullYear();
+        document.getElementById("birth-year").setAttribute("max", currentYear);
+
+        function calculateBMI(weight, height) {
+            return (weight / ((height / 100) ** 2)).toFixed(2);
+        }
+
+        function calculateCalories(weight, height, age, gender, goal) {
+            let BMR = gender === 'male' 
+                ? 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age) 
+                : 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+
+            let calorieMultiplier = goal === 'gain' ? 1.5 : goal === 'lose' ? 1.0 : 1.2;
+            return Math.round(BMR * calorieMultiplier);
+        }
+
+        function calculateAge(birthYear) {
+            return currentYear - birthYear;
+        }
+
+        function getWorkoutPlan(goal) {
+            return {
+                gain: {
+                    Monday: ["Full-body strength", "20-min jog"],
+                    Tuesday: ["Upper body", "Core workout"],
+                    Wednesday: ["Yoga/stretching"],
+                    Thursday: ["Lower body", "20-min cycling"],
+                    Friday: ["Full-body strength", "Core workout"],
+                    Saturday: ["30-min jog"],
+                    Sunday: ["Rest"]
+                },
+                lose: {
+                    Monday: ["30-min run", "Circuit strength"],
+                    Tuesday: ["45-min cycling", "Core"],
+                    Wednesday: ["Upper body", "Flexibility"],
+                    Thursday: ["30-min swim", "Core"],
+                    Friday: ["Lower body", "20-min walk"],
+                    Saturday: ["HIIT 20-min"],
+                    Sunday: ["Rest"]
+                },
+                maintain: {
+                    Monday: ["Full-body strength", "30-min jog"],
+                    Tuesday: ["Core", "30-min cycling"],
+                    Wednesday: ["Yoga"],
+                    Thursday: ["Upper body", "20-min swim"],
+                    Friday: ["Lower body", "Core"],
+                    Saturday: ["30-min HIIT"],
+                    Sunday: ["Rest"]
+                }
+            }[goal];
+        }
+
+        function getDietPlan(goal, allergies) {
+            let plans = {
+                gain: "High-calorie meals with lean proteins, whole grains, and healthy fats.",
+                lose: "Lean proteins, complex carbs, and vegetables. Avoid processed foods.",
+                maintain: "Balanced meals with proteins, carbs, and healthy fats."
+            };
+
+            if (allergies) {
+                let allergyList = allergies.split(',').map(item => item.trim().toLowerCase());
+                allergyList.forEach(allergy => {
+                    plans[goal] = plans[goal].replace(new RegExp(allergy, 'gi'), `[Avoid: ${allergy}]`);
+                });
+            }
+            return plans[goal];
+        }
+
+        function generatePlan() {
+            const height = parseFloat(document.getElementById("height").value);
+            const weight = parseFloat(document.getElementById("weight").value);
+            const birthYear = parseInt(document.getElementById("birth-year").value);
+            const gender = document.getElementById("gender").value;
+            const allergies = document.getElementById("allergies").value;
+            const goal = document.getElementById("goal").value;
+
+            if (birthYear < 1900 || birthYear > currentYear) {
+                alert("Please enter a valid birth year.");
+                return;
+            }
+
+            const age = calculateAge(birthYear);
+            const bmi = calculateBMI(weight, height);
+            const dailyCalories = calculateCalories(weight, height, age, gender, goal);
+            const workoutPlan = getWorkoutPlan(goal);
+            const dietPlan = getDietPlan(goal, allergies);
+
+            let outputHtml = `<h2>Your Fitness Summary</h2>
+                <p><strong>Your BMI:</strong> ${bmi}</p>
+                <p><strong>Your Age:</strong> ${age}</p>
+                <p><strong>Daily Calories:</strong> ${dailyCalories} kcal</p>
+                <h3>Your Workout Plan:</h3><ul>`;
+
+            for (const [day, activities] of Object.entries(workoutPlan)) {
+                outputHtml += `<li><strong>${day}:</strong> ${activities.join(", ")}</li>`;
+            }
+
+            outputHtml += `</ul><h3>Your Diet Plan:</h3><p>${dietPlan}</p>`;
+            document.getElementById("output").innerHTML = outputHtml;
+        }
+    </script>
+
+</body>
+</html>
