@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Fitness Program</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            color: #333;
+            margin: 20px;
+        }
+        h1, h2, h3 {
+            color: #0044cc;
+        }
+        form {
+            background-color: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #ffd700;
+        }
+        label {
+            font-weight: bold;
+            margin: 10px 0 5px;
+            display: block;
+        }
+        input, select {
+            padding: 10px;
+            width: 100%;
+            border: 2px solid #0044cc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #0044cc;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #002a80;
+        }
+        #output {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9ff;
+            border-left: 5px solid #ffd700;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Welcome to Your Personalized Fitness Program</h1>
+
+    <form id="fitness-form">
+        <label for="height">Height (in cm): </label>
+        <input type="number" id="height" name="height" min="1" required>
+
+        <label for="weight">Weight (in kg): </label>
+        <input type="number" id="weight" name="weight" min="1" required>
+
+        <label for="birth-year">Birth Year: </label>
+        <input type="number" id="birth-year" name="birth-year" min="1900" required>
+
+        <label for="gender">Gender: </label>
+        <select id="gender" name="gender" required>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select>
+
+        <label for="finance">Finance (for diet and supplements budget): </label>
+        <input type="number" id="finance" name="finance" min="0" required>
+
+        <label for="allergies">Do you have any food allergies? (List, separated by commas): </label>
+        <input type="text" id="allergies" name="allergies">
+
+        <label for="goal">Select your goal: </label>
+        <select id="goal" name="goal" required>
+            <option value="gain">Gain Weight</option>
+            <option value="lose">Lose Weight</option>
+            <option value="maintain">Maintain Weight</option>
+        </select>
+
+        <button type="submit">Get Fitness Plan</button>
+    </form>
+
+    <div id="output"></div>
+
+    <script>
+        document.getElementById("fitness-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const userData = Object.fromEntries(formData.entries());
+            
+            document.getElementById("output").innerHTML = "Generating your personalized plan...";
+
+            try {
+                const response = await fetch("/api/generate-plan", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(userData)
+                });
+                const data = await response.json();
+                document.getElementById("output").innerHTML = `<h2>Your Personalized Plan</h2><p>${data.plan}</p>`;
+            } catch (error) {
+                document.getElementById("output").innerHTML = "Error generating plan. Please try again.";
+            }
+        });
+    </script>
+</body>
+</html>
+
