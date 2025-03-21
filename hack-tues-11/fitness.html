@@ -1,0 +1,81 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Fitness Program</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../hack-tues-11/assets/style.css" />
+</head>
+<body>
+    <header>
+        <a href="../hack-tues-11/index.html" class="logo"><img src="https://github.com/yavi823/hack-tues-11/blob/main/image.png?raw=true" alt="Logo"></a> 
+        <div>
+            <h1>Hack the Health <i class="fas fa-heartbeat"></i></h1>
+            <p class="subtitle">Better your plan for a better future</p>
+        </div>
+    </header>
+    <main>
+        <section class="cta-section">
+            <h2>Welcome to Your Personalized Fitness Program <i class="fas fa-dumbbell"></i></h2>
+        </section>
+        <section class="form-container">
+            
+            <form id="fitness-form">
+                <label for="height"><i class="fas fa-ruler-vertical"></i> Height (in cm): </label>
+                <input type="number" id="height" name="height" min="1" required>
+    
+                <label for="weight"><i class="fas fa-weight"></i> Weight (in kg): </label>
+                <input type="number" id="weight" name="weight" min="1" required>
+    
+                <label for="birth-year"><i class="fas fa-birthday-cake"></i> Birth Year: </label>
+                <input type="number" id="birth-year" name="birth-year" min="1900" required>
+    
+                <label for="gender"><i class="fas fa-venus-mars"></i> Gender: </label>
+                <select id="gender" name="gender" required>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+    
+                <label for="finance"><i class="fas fa-coins"></i> Finance (for diet and supplements budget): </label>
+                <input type="number" id="finance" name="finance" min="0" required>
+    
+                <label for="allergies"><i class="fas fa-allergies"></i> Do you have any food allergies? (List, separated by commas): </label>
+                <input type="text" id="allergies" name="allergies">
+    
+                <label for="goal"><i class="fas fa-bullseye"></i> Select your goal: </label>
+                <select id="goal" name="goal" required>
+                    <option value="gain">Gain Weight</option>
+                    <option value="lose">Lose Weight</option>
+                    <option value="maintain">Maintain Weight</option>
+                </select>
+    
+                <button class="btn btn-size" type="submit"><i class="fas fa-rocket"></i> Get Fitness Plan</button>
+            </form>
+        </section>
+    </main>
+    
+    <script>
+        document.getElementById("fitness-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const userData = Object.fromEntries(formData.entries());
+            
+            document.getElementById("output").innerHTML = "Generating your personalized plan...";
+
+            try {
+                const response = await fetch("/api/generate-plan", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(userData)
+                });
+                const data = await response.json();
+                document.getElementById("output").innerHTML = `<h2>Your Personalized Plan</h2><p>${data.plan}</p>`;
+            } catch (error) {
+                document.getElementById("output").innerHTML = "Error generating plan. Please try again.";
+            }
+        });
+    </script>
+</body>
+</html>
