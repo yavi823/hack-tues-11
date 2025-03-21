@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Fitness Program</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, select {
+            padding: 5px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #output {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Welcome to Your Personalized Fitness Program</h1>
+
+    <form id="fitness-form">
+        <label for="email">Email: </label>
+        <input type="email" id="email" name="email" required><br>
+
+        <label for="password">Password: </label>
+        <input type="password" id="password" name="password" required><br>
+
+        <label for="height">Height (in cm): </label>
+        <input type="number" id="height" name="height" min="1" required><br>
+
+        <label for="weight">Weight (in kg): </label>
+        <input type="number" id="weight" name="weight" min="1" required><br>
+
+        <label for="birth-year">Birth Year: </label>
+        <input type="number" id="birth-year" name="birth-year" min="1900" required><br>
+
+        <label for="gender">Gender: </label>
+        <select id="gender" name="gender" required>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select><br>
+
+        <label for="finance">Finance (for diet and supplements budget): </label>
+        <input type="number" id="finance" name="finance" min="0" required><br>
+
+        <label for="allergies">Do you have any food allergies? (Please list any, separated by commas): </label>
+        <input type="text" id="allergies" name="allergies"><br>
+
+        <label for="goal">Select your goal: </label>
+        <select id="goal" name="goal" required>
+            <option value="gain">Gain Weight</option>
+            <option value="lose">Lose Weight</option>
+            <option value="maintain">Maintain Weight</option>
+        </select><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="output"></div>
+
+    <script>
+        document.getElementById("fitness-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const currentYear = new Date().getFullYear();
+            const birthYear = parseInt(document.getElementById("birth-year").value);
+            if (birthYear < 1900 || birthYear > currentYear) {
+                alert("Please enter a valid birth year.");
+                return;
+            }
+
+            const userData = {
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value,
+                height: parseFloat(document.getElementById("height").value),
+                weight: parseFloat(document.getElementById("weight").value),
+                budget: parseFloat(document.getElementById("finance").value),
+                allergies: document.getElementById("allergies").value,
+                goal: document.getElementById("goal").value
+            };
+
+            try {
+                const response = await fetch("/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(userData)
+                });
+
+                const result = await response.json();
+                document.getElementById("output").innerHTML = `<p>${result.message}</p>`;
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Failed to save data.");
+            }
+        });
+        function calculateCalories(weight, height, age, gender, goal) {
+            let BMR;
+            if (gender === 'male') {
+                BMR = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+            } else {
+                BMR = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+            }
+
+            let calorieMultiplier = 1.2;
+            if (goal === 'gain') {
+                calorieMultiplier = 1.5;
+            } else if (goal === 'lose') {
+                calorieMultiplier = 1.0;
+            }
+
+            return Math.round(BMR * calorieMultiplier);
+        }
+
+        function calculateAge(birthYear) {
+            return currentYear - birthYear;
+        }
+
+        function getWorkoutPlan(goal) {
+            const workoutPlans = {
+                gain: {
+                    Monday: ["Strength training: Full-body workout", "Cardio: 20-minute jog"],
+                    Tuesday: ["Strength training: Upper body", "Core workout"],
+                    Wednesday: ["Active rest: Yoga or stretching"],
+                    Thursday: ["Strength training: Lower body", "Cardio: 20-minute cycling"],
+                    Friday: ["Strength training: Full-body", "Core workout"],
+                    Saturday: ["Cardio: 30-minute jog"],
+                    Sunday: ["Rest day"]
+                },
+                lose: {
+                    Monday: ["Cardio: 30-minute run", "Strength training: Circuit"],
+                    Tuesday: ["Cardio: 45-minute cycling", "Core workout"],
+                    Wednesday: ["Strength training: Upper body", "Flexibility training"],
+                    Thursday: ["Cardio: 30-minute swimming", "Core workout"],
+                    Friday: ["Strength training: Lower body", "Cardio: 20-minute brisk walk"],
+                    Saturday: ["HIIT: 20-minute session"],
+                    Sunday: ["Rest day"]
+                },
+                maintain: {
+                    Monday: ["Strength training: Full-body", "Cardio: 30-minute jog"],
+                    Tuesday: ["Core workout", "Cardio: 30-minute cycling"],
+                    Wednesday: ["Active rest: Yoga"],
+                    Thursday: ["Strength training: Upper body", "Cardio: 20-minute swim"],
+                    Friday: ["Strength training: Lower body", "Core workout"],
+                    Saturday: ["Cardio: 30-minute HIIT"],
+                    Sunday: ["Rest day"]
+                }
+            };
+            return workoutPlans[goal];
+        }
+
+        function getDietPlan(goal, allergies) {
+            let dietPlans = {
+                gain: "Eat calorie-dense meals with lean proteins, whole grains, and healthy fats. Avoid allergens.",
+                lose: "Eat lean proteins, complex carbs, and vegetables. Avoid processed foods and allergens.",
+                maintain: "Eat a balanced diet with proteins, carbs, and healthy fats. Avoid allergens."
+            };
+
+            if (allergies) {
+                const allergyList = allergies.split(',').map(item => item.trim().toLowerCase());
+                allergyList.forEach(allergy => {
+                    dietPlans[goal] = dietPlans[goal].replace(new RegExp(allergy, 'gi'), `[ALERT: Avoid this ingredient]`);
+                });
+            }
+
+            return dietPlans[goal];
+        }
+
+        function generatePlan() {
+            const height = parseFloat(document.getElementById("height").value);
+            const weight = parseFloat(document.getElementById("weight").value);
+            const birthYear = parseInt(document.getElementById("birth-year").value);
+            const gender = document.getElementById("gender").value;
+            const finance = parseFloat(document.getElementById("finance").value);
+            const allergies = document.getElementById("allergies").value;
+            const goal = document.getElementById("goal").value;
+
+            if (birthYear < 1900 || birthYear > currentYear) {
+                alert("Please enter a valid birth year.");
+                return;
+            }
+
+            const age = calculateAge(birthYear);
+            const bmi = calculateBMI(weight, height);
+            const dailyCalories = calculateCalories(weight, height, age, gender, goal);
+            const workoutPlan = getWorkoutPlan(goal);
+            const dietPlan = getDietPlan(goal, allergies);
+
+            let outputHtml = `
+                <h2>Your Fitness Summary</h2>
+                <p>Your BMI: ${bmi}</p>
+                <p>Your Age: ${age}</p>
+                <p>Daily Caloric Intake: ${dailyCalories} kcal</p>
+                <h3>Your Workout Plan:</h3><ul>
+            `;
+
+            for (const [day, activities] of Object.entries(workoutPlan)) {
+                outputHtml += `<li><strong>${day}:</strong> ${activities.join(", ")}</li>`;
+            }
+
+            outputHtml += `</ul><h3>Your Diet Plan:</h3><p>${dietPlan}</p>`;
+
+            document.getElementById("output").innerHTML = outputHtml;
+        }
+    </script>
+</body>
+</html>
+   
