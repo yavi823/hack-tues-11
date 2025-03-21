@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Fitness Program</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #6ede66, #26A9E0);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1, h2, h3 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 36px;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        form {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #ff6b6b;
+            max-width: 500px;
+            margin: 0 auto;
+            animation: slideIn 1s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        label {
+            font-weight: bold;
+            margin: 15px 0 5px;
+            display: block;
+            text-align: left;
+            color: #0077b6;
+        }
+
+        input, select {
+            padding: 12px;
+            width: 100%;
+            border: 2px solid #0077b6;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+            input:focus, select:focus {
+                border-color: #ff6b6b;
+                outline: none;
+            }
+
+        button {
+            padding: 15px;
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+            button:hover {
+                background-color: #e63946;
+                transform: scale(1.05);
+            }
+
+            button i {
+                font-size: 20px;
+            }
+
+        #output {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-left: 5px solid #ff6b6b;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 20px auto;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .form-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+            .form-container::before, .form-container::after {
+                content: '';
+                position: absolute;
+                width: 150px;
+                height: 150px;
+                background: rgba(255, 107, 107, 0.1);
+                border-radius: 50%;
+                animation: move 10s infinite linear;
+            }
+
+            .form-container::before {
+                top: -50px;
+                left: -50px;
+            }
+
+            .form-container::after {
+                bottom: -50px;
+                right: -50px;
+            }
+
+        @keyframes move {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(20px, 20px);
+            }
+
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Welcome to Your Personalized Fitness Program <i class="fas fa-dumbbell"></i></h1>
+
+    <div class="form-container">
+        <form id="fitness-form">
+            <label for="height"><i class="fas fa-ruler-vertical"></i> Height (in cm): </label>
+            <input type="number" id="height" name="height" min="1" required>
+
+            <label for="weight"><i class="fas fa-weight"></i> Weight (in kg): </label>
+            <input type="number" id="weight" name="weight" min="1" required>
+
+            <label for="birth-year"><i class="fas fa-birthday-cake"></i> Birth Year: </label>
+            <input type="number" id="birth-year" name="birth-year" min="1900" required>
+
+            <label for="gender"><i class="fas fa-venus-mars"></i> Gender: </label>
+            <select id="gender" name="gender" required>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+
+            <label for="finance"><i class="fas fa-coins"></i> Finance (for diet and supplements budget): </label>
+            <input type="number" id="finance" name="finance" min="0" required>
+
+            <label for="allergies"><i class="fas fa-allergies"></i> Do you have any food allergies? (List, separated by commas): </label>
+            <input type="text" id="allergies" name="allergies">
+
+            <label for="goal"><i class="fas fa-bullseye"></i> Select your goal: </label>
+            <select id="goal" name="goal" required>
+                <option value="gain">Gain Weight</option>
+                <option value="lose">Lose Weight</option>
+                <option value="maintain">Maintain Weight</option>
+            </select>
+
+            <button type="submit"><i class="fas fa-rocket"></i> Get Fitness Plan</button>
+        </form>
+    </div>
+
+    <div id="output"></div>
+
+    <script>
+        document.getElementById("fitness-form").addEventListener("submit", async function (event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const userData = Object.fromEntries(formData.entries());
+
+            document.getElementById("output").innerHTML = "Generating your personalized plan...";
+
+            try {
+                const response = await fetch("/api/generate-plan", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(userData)
+                });
+                const data = await response.json();
+                document.getElementById("output").innerHTML = `<h2>Your Personalized Plan</h2><p>${data.plan}</p>`;
+            } catch (error) {
+                document.getElementById("output").innerHTML = "Error generating plan. Please try again.";
+            }
+        });
+    </script>
+</body>
+</html>
