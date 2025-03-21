@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Fitness Program</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, select {
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #output {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Welcome to Your Personalized Fitness Program</h1>
+
+    <form id="fitness-form" onsubmit="event.preventDefault(); generatePlan();">
+        <label for="height">Height (in cm): </label>
+        <input type="number" id="height" name="height" required><br>
+
+        <label for="weight">Weight (in kg): </label>
+        <input type="number" id="weight" name="weight" required><br>
+
+        <label for="birth-year">Birth Year: </label>
+        <input type="number" id="birth-year" name="birth-year" required><br>
+
+        <label for="gender">Gender: </label>
+        <select id="gender" name="gender" required>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select><br>
+
+        <label for="finance">Finance (for diet and supplements budget): </label>
+        <input type="number" id="finance" name="finance" required><br>
+
+        <label for="allergies">Do you have any food allergies? (Please list any, separated by commas): </label>
+        <input type="text" id="allergies" name="allergies"><br>
+
+        <label for="goal">Select your goal: </label>
+        <select id="goal" name="goal" required>
+            <option value="gain">Gain Weight</option>
+            <option value="lose">Lose Weight</option>
+            <option value="maintain">Maintain Weight</option>
+        </select><br>
+
+        <button type="submit">Get Fitness Plan</button>
+    </form>
+
+    <div id="output"></div>
+
+    <script>
+        function calculateBMI(weight, height) {
+            return (weight / ((height / 100) ** 2)).toFixed(2);
+        }
+
+        function calculateCalories(weight, height, age, gender, goal) {
+            let BMR;
+            if (gender === 'male') {
+                BMR = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+            } else {
+                BMR = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+            }
+
+            let calorieMultiplier = 1.2;
+            if (goal === 'gain') {
+                calorieMultiplier = 1.5;
+            } else if (goal === 'lose') {
+                calorieMultiplier = 1.0;
+            }
+
+            return Math.round(BMR * calorieMultiplier);
+        }
+
+        function calculateAge(birthYear) {
+            const currentYear = new Date().getFullYear();
+            return currentYear - birthYear;
+        }
+
+        function getWorkoutPlan(goal) {
+            const workoutPlans = {
+                gain: {
+                    Monday: ["Strength training: Full-body workout (squats, deadlifts, bench press)", "Cardio: 20-minute light jog"],
+                    Tuesday: ["Strength training: Upper body (push-ups, bicep curls, shoulder press)", "Core workout (planks, Russian twists)"],
+                    Wednesday: ["Active rest: Stretching or yoga"],
+                    Thursday: ["Strength training: Lower body (lunges, calf raises)", "Cardio: 20-minute bike ride"],
+                    Friday: ["Strength training: Full-body workout", "Core workout (crunches, leg raises)"],
+                    Saturday: ["Cardio: 30-minute light jog"],
+                    Sunday: ["Rest day"]
+                },
+                lose: {
+                    Monday: ["Cardio: 30-minute running", "Strength training: Full-body circuit"],
+                    Tuesday: ["Cardio: 45-minute cycling", "Core workout"],
+                    Wednesday: ["Strength training: Upper body", "Flexibility training"],
+                    Thursday: ["Cardio: 30-minute swimming", "Core workout"],
+                    Friday: ["Strength training: Lower body", "Cardio: 20-minute brisk walk"],
+                    Saturday: ["HIIT: 20-minute session"],
+                    Sunday: ["Rest day"]
+                },
+                maintain: {
+                    Monday: ["Strength training: Full-body workout", "Cardio: 30-minute jog"],
+                    Tuesday: ["Core workout", "Cardio: 30-minute cycling"],
+                    Wednesday: ["Active rest: Yoga"],
+                    Thursday: ["Strength training: Upper body", "Cardio: 20-minute swim"],
+                    Friday: ["Strength training: Lower body", "Core workout"],
+                    Saturday: ["Cardio: 30-minute HIIT"],
+                    Sunday: ["Rest day"]
+                }
+            };
+            return workoutPlans[goal];
+        }
+
+        function getDietPlan(goal, allergies) {
+            let dietPlans = {
+                gain: "Eat calorie-dense meals with lean proteins (chicken, beef), whole grains, healthy fats, and dairy products. If you have allergies, avoid foods like nuts, dairy, or gluten.",
+                lose: "Eat lean proteins (chicken, fish), complex carbs (sweet potatoes, quinoa), and plenty of vegetables. Avoid processed foods and allergens.",
+                maintain: "Eat a balanced diet with proteins, carbs, and healthy fats. Make sure to avoid allergens and enjoy fruits and veggies."
+            };
+
+            if (allergies) {
+                const allergyList = allergies.split(',').map(item => item.trim().toLowerCase());
+                allergyList.forEach(allergy => {
+                    dietPlans[goal] = dietPlans[goal].replace(new RegExp(allergy, 'gi'), `[ALERT: Avoid this ingredient due to allergy]`);
+                });
+            }
+
+            return dietPlans[goal];
+        }
+
+        function generatePlan() {
+
+            const height = parseFloat(document.getElementById("height").value);
+            const weight = parseFloat(document.getElementById("weight").value);
+            const birthYear = parseInt(document.getElementById("birth-year").value);
+            const gender = document.getElementById("gender").value;
+            const finance = parseFloat(document.getElementById("finance").value);
+            const allergies = document.getElementById("allergies").value;
+            const goal = document.getElementById("goal").value;
+
+            const age = calculateAge(birthYear);
+            const bmi = calculateBMI(weight, height);
+            const dailyCalories = calculateCalories(weight, height, age, gender, goal);
+
+            const workoutPlan = getWorkoutPlan(goal);
+            const dietPlan = getDietPlan(goal, allergies);
+
+            let outputHtml = `
+                <h2>Your Fitness Summary</h2>
+                <p>Your BMI: ${bmi}</p>
+                <p>Your age: ${age}</p>
+                <p>Recommended goal: ${goal}</p>
+                <p>Daily Caloric Intake: ${dailyCalories} kcal</p>
+                <p>Finance Budget: $${finance}</p>
+                <h3>Your Workout Plan:</h3>
+                <ul>
+            `;
+
+            for (const [day, activities] of Object.entries(workoutPlan)) {
+                outputHtml += `<li><strong>${day}:</strong><ul>`;
+                activities.forEach(activity => {
+                    outputHtml += `<li>${activity}</li>`;
+                });
+                outputHtml += `</ul></li>`;
+            }
+
+            outputHtml += `</ul><h3>Your Diet Plan:</h3><p>${dietPlan}</p>`;
+
+            document.getElementById("output").innerHTML = outputHtml;
+        }
+    </script>
+
+</body>
+</html>
